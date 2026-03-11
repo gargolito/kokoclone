@@ -1,9 +1,9 @@
 [project]
 name = "kokoclone"
 version = "0.1.0"
-description = "Add your description here"
+description = "KokoClone is a fast, real-time compatible multilingual voice cloning system built on top of Kokoro-ONNX, one of the fastest open-source neural TTS engines available today."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "gradio>=6.8.0",
     "huggingface-hub>=1.5.0",

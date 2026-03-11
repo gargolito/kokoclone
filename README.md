@@ -117,15 +117,15 @@ with **[uv](https://docs.astral.sh/uv/)**, a fast Python package and project man
 
 ### Prerequisites
 
-* Python 3.13+
+With uv
+
 * [uv](https://docs.astral.sh/uv/) — install with:
 
 ```bash
 # macOS / Linux <- preferred method
 
 curl -LsSf https://astral.sh/uv/install.sh | sh
-# or via pip
-pip install uv
+
 ```
 
 ### Clone the Repository
