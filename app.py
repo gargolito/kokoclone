@@ -46,8 +46,18 @@ def convert_voice(source_audio_path, ref_audio_path):
     except Exception as e:
         raise gr.Error(f"An error occurred during conversion: {str(e)}")
 
+def stop_cloning():
+    """Signals the cloner to stop current work."""
+    cloner.stop()
+    return gr.update(value="🚀 Generate Clone", interactive=True), gr.update(visible=False)
+
+def stop_converting():
+    """Signals the cloner to stop current work."""
+    cloner.stop()
+    return gr.update(value="🔁 Convert Voice", interactive=True), gr.update(visible=False)
+
 # 2. Build the Gradio UI using Blocks
-with gr.Blocks() as demo:
+with gr.Blocks(title="KokoClone") as demo:
     gr.Markdown(
         """
         <div style="text-align: center;">
@@ -88,18 +98,19 @@ with gr.Blocks() as demo:
                         value="en"
                     )
 
-                    ref_audio_input = gr.Audio(
-                        label="3. Reference Voice (Upload or Record)",
-                        type="filepath"
-                    )
-
-                    submit_btn = gr.Button("🚀 Generate Clone", variant="primary")
-
-                with gr.Column(scale=1):
                     output_audio = gr.Audio(
                         label="Generated Cloned Audio",
                         interactive=False,
                         autoplay=False
+                    )
+
+                    submit_btn = gr.Button("🚀 Generate Clone", variant="primary")
+                    stop_btn = gr.Button("🛑 Stop", variant="stop", visible=False)
+
+                with gr.Column(scale=1):
+                    ref_audio_input = gr.Audio(
+                        label="3. Reference Voice (Upload or Record)",
+                        type="filepath"
                     )
 
                     gr.Markdown(
@@ -114,16 +125,22 @@ with gr.Blocks() as demo:
                         """
                     )
 
-            submit_btn.click(
-                fn=lambda: gr.update(value="⌛ Generating...", interactive=False),
-                outputs=submit_btn
+            generate_event = submit_btn.click(
+                fn=lambda: (gr.update(value="⌛ Generating...", interactive=False), gr.update(visible=True)),
+                outputs=[submit_btn, stop_btn]
             ).then(
                 fn=clone_voice,
                 inputs=[text_input, lang_input, ref_audio_input],
                 outputs=output_audio
             ).then(
-                fn=lambda: gr.update(value="🚀 Generate Clone", interactive=True),
-                outputs=submit_btn
+                fn=lambda: (gr.update(value="🚀 Generate Clone", interactive=True), gr.update(visible=False)),
+                outputs=[submit_btn, stop_btn]
+            )
+
+            stop_btn.click(
+                fn=stop_cloning,
+                outputs=[submit_btn, stop_btn],
+                cancels=[generate_event]
             )
 
         # ── Tab 2: Audio → Re-voiced Speech ─────────────────────────────────
@@ -141,6 +158,7 @@ with gr.Blocks() as demo:
                     )
 
                     convert_btn = gr.Button("🔁 Convert Voice", variant="primary")
+                    stop_convert_btn = gr.Button("🛑 Stop", variant="stop", visible=False)
 
                 with gr.Column(scale=1):
                     convert_output_audio = gr.Audio(
@@ -164,16 +182,22 @@ with gr.Blocks() as demo:
                         """
                     )
 
-            convert_btn.click(
-                fn=lambda: gr.update(value="⌛ Converting...", interactive=False),
-                outputs=convert_btn
+            convert_event = convert_btn.click(
+                fn=lambda: (gr.update(value="⌛ Converting...", interactive=False), gr.update(visible=True)),
+                outputs=[convert_btn, stop_convert_btn]
             ).then(
                 fn=convert_voice,
                 inputs=[source_audio_input, ref_audio_convert_input],
                 outputs=convert_output_audio
             ).then(
-                fn=lambda: gr.update(value="🔁 Convert Voice", interactive=True),
-                outputs=convert_btn
+                fn=lambda: (gr.update(value="🔁 Convert Voice", interactive=True), gr.update(visible=False)),
+                outputs=[convert_btn, stop_convert_btn]
+            )
+
+            stop_convert_btn.click(
+                fn=stop_converting,
+                outputs=[convert_btn, stop_convert_btn],
+                cancels=[convert_event]
             )
 
 # 4. Launch the app
