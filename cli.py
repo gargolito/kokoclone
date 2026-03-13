@@ -17,7 +17,7 @@ def main() -> None:
         "--lang",
         type=str,
         default="en",
-        help="[tts mode] Language code (en, hi, fr, ja, zh, it, pt, es)",
+        help="[tts mode] Language code (en, en-gb, bf_alice, bf_emma, bf_lily, hi, fr, ja, zh, it, pt, es)",
     )
     parser.add_argument(
         "--source",
